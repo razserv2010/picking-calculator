@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>מחשבון ליקוט - רז</title>
+    <title>מנדלסון - אפליקציית ליקוט</title>
     <style>
         :root { --primary: #1a73e8; --secondary: #34a853; --accent: #d93025; --bg: #f1f3f4; }
         body { font-family: system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; }
         .app { width: 100%; max-width: 450px; }
+        .header-title { text-align: center; color: var(--primary); font-size: 28px; font-weight: bold; margin: 10px 0 20px 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
         .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 6px solid var(--primary); }
         .card.green { border-top-color: var(--secondary); }
         h2 { margin: 0 0 15px 0; color: #333; font-size: 19px; display: flex; align-items: center; gap: 8px; }
@@ -20,11 +21,13 @@
         .box-results { display: flex; gap: 10px; margin-top: 10px; }
         .box-info { flex: 1; background: #e8f0fe; color: var(--primary); padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; }
         .box-info span { display: block; font-size: 28px; margin-top: 5px; }
-        .footer { text-align: center; color: #9aa0a6; font-size: 12px; margin-top: 20px; }
+        .footer { text-align: center; color: #9aa0a6; font-size: 14px; margin-top: 20px; padding-bottom: 20px; }
     </style>
 </head>
 <body>
 <div class="app">
+    <div class="header-title">מנדלסון</div>
+
     <div class="card">
         <h2>📦 מחשבון ארגזים</h2>
         <div class="input-group"><label>כמות לליקוט:</label><input type="number" id="boxTotal" placeholder="הקלד..." oninput="calc()" onclick="this.select()"></div>
@@ -51,7 +54,7 @@
         </div>
     </div>
 
-    <div class="footer">אפליקציית ליקוט - רז</div>
+    <div class="footer">נוצר על ידי רז .ח.</div>
 </div>
 
 <script>
