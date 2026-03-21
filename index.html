@@ -14,7 +14,7 @@
         .row { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #eee; }
         .input-group { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         label { font-size: 15px; font-weight: bold; color: #444; }
-        input { width: 90px; padding: 12px; border: 2px solid #dfe1e5; border-radius: 10px; font-size: 20px; text-align: center; box-sizing: border-box; }
+        input { width: 100px; padding: 12px; border: 2px solid #dfe1e5; border-radius: 10px; font-size: 20px; text-align: center; box-sizing: border-box; }
         input:focus { border-color: var(--primary); outline: none; background: #fff; }
         .result-final { background: #fee8e6; color: var(--accent); padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 19px; border: 1px solid #fad2cf; margin-top: 5px; }
         .box-results { display: flex; gap: 10px; margin-top: 10px; }
@@ -27,8 +27,8 @@
 <div class="app">
     <div class="card">
         <h2>📦 מחשבון ארגזים</h2>
-        <div class="input-group"><label>כמות לליקוט:</label><input type="number" id="boxTotal" value="0" oninput="calc()" onclick="this.select()"></div>
-        <div class="input-group"><label>כמות בארגז:</label><input type="number" id="boxQty" value="0" oninput="calc()" onclick="this.select()"></div>
+        <div class="input-group"><label>כמות לליקוט:</label><input type="number" id="boxTotal" placeholder="הקלד..." oninput="calc()" onclick="this.select()"></div>
+        <div class="input-group"><label>כמות בארגז:</label><input type="number" id="boxQty" placeholder="הקלד..." oninput="calc()" onclick="this.select()"></div>
         <div class="box-results">
             <div class="box-info">ארגזים מלאים <span id="resBox">0</span></div>
             <div class="box-info">בודדים <span id="resLoose">0</span></div>
@@ -38,7 +38,7 @@
     <div class="card">
         <h2>🚰 ליקוט צינורות</h2>
         <div class="row">
-            <div class="input-group"><label>צינור 4 מ' (מטר):</label><input type="number" id="p4M" value="0" oninput="calc()" onclick="this.select()"></div>
+            <div class="input-group"><label>צינור 4 מ' (מטר):</label><input type="number" id="p4M" placeholder="הקלד..." oninput="calc()" onclick="this.select()"></div>
             <div class="result-final"><span id="p4R">0</span> יחידות לליקוט</div>
         </div>
     </div>
@@ -46,7 +46,7 @@
     <div class="card green">
         <h2>🔥 ליקוט בידוד</h2>
         <div class="row">
-            <div class="input-group"><label>בידוד 2 מ' (מטר):</label><input type="number" id="isoM" value="0" oninput="calc()" onclick="this.select()"></div>
+            <div class="input-group"><label>בידוד 2 מ' (מטר):</label><input type="number" id="isoM" placeholder="הקלד..." oninput="calc()" onclick="this.select()"></div>
             <div class="result-final"><span id="isoR">0</span> יחידות לליקוט</div>
         </div>
     </div>
@@ -70,7 +70,6 @@ function calc() {
     document.getElementById('p4R').innerText = Math.ceil((parseFloat(document.getElementById('p4M').value) || 0) / 4);
     document.getElementById('isoR').innerText = Math.ceil((parseFloat(document.getElementById('isoM').value) || 0) / 2);
 }
-calc();
 </script>
 </body>
 </html>
