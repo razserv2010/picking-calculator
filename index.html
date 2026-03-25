@@ -16,7 +16,7 @@
         .input-group { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
         label { font-size: 15px; font-weight: bold; color: #444; }
         input { width: 110px; padding: 12px; border: 2px solid #dfe1e5; border-radius: 10px; font-size: 20px; text-align: center; box-sizing: border-box; background: #fff; -webkit-appearance: none; }
-        input:focus { border-color: var(--primary); outline: none; background: #e8f0fe; }
+        input:focus { border-color: var(--primary); outline: none; background: #e8f0fe; box-shadow: 0 0 5px rgba(26, 115, 232, 0.3); }
         .result-final { background: #fee8e6; color: var(--accent); padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 19px; border: 1px solid #fad2cf; margin-top: 5px; }
         .box-results { display: flex; gap: 10px; margin-top: 10px; }
         .box-info { flex: 1; background: #e8f0fe; color: var(--primary); padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; }
@@ -30,8 +30,14 @@
 
     <div class="card">
         <h2>📦 ליקוט כללי</h2>
-        <div class="input-group"><label>כמות לליקוט:</label><input type="number" id="boxTotal" placeholder="0" oninput="calc()" onfocus="this.select()" onclick="this.select()" autocomplete="off"></div>
-        <div class="input-group"><label>כמות בקרטון/ארגז:</label><input type="number" id="boxQty" placeholder="0" oninput="calc()" onfocus="this.select()" onclick="this.select()" autocomplete="off"></div>
+        <div class="input-group">
+            <label>כמות לליקוט:</label>
+            <input type="tel" id="boxTotal" placeholder="0" oninput="calc()" onfocus="this.select()" onclick="this.focus();this.select()" autocomplete="off">
+        </div>
+        <div class="input-group">
+            <label>כמות בקרטון/ארגז:</label>
+            <input type="tel" id="boxQty" placeholder="0" oninput="calc()" onfocus="this.select()" onclick="this.focus();this.select()" autocomplete="off">
+        </div>
         <div class="box-results">
             <div class="box-info">קרטונים מלאים: <span id="resBox">0</span></div>
             <div class="box-info">בודדים: <span id="resLoose">0</span></div>
@@ -41,7 +47,10 @@
     <div class="card">
         <h2>🚰 ליקוט צינורות</h2>
         <div class="row">
-            <div class="input-group"><label>צינור 4 מ' (מטר):</label><input type="number" id="p4M" placeholder="0" oninput="calc()" onfocus="this.select()" onclick="this.select()" autocomplete="off"></div>
+            <div class="input-group">
+                <label>צינור 4 מ' (מטר):</label>
+                <input type="tel" id="p4M" placeholder="0" oninput="calc()" onfocus="this.select()" onclick="this.focus();this.select()" autocomplete="off">
+            </div>
             <div class="result-final"><span id="p4R">0</span> יחידות לליקוט</div>
         </div>
     </div>
@@ -49,7 +58,10 @@
     <div class="card green">
         <h2>🔥 ליקוט בידוד</h2>
         <div class="row">
-            <div class="input-group"><label>בידוד 2 מ' (מטר):</label><input type="number" id="isoM" placeholder="0" oninput="calc()" onfocus="this.select()" onclick="this.select()" autocomplete="off"></div>
+            <div class="input-group">
+                <label>בידוד 2 מ' (מטר):</label>
+                <input type="tel" id="isoM" placeholder="0" oninput="calc()" onfocus="this.select()" onclick="this.focus();this.select()" autocomplete="off">
+            </div>
             <div class="result-final"><span id="isoR">0</span> יחידות לליקוט</div>
         </div>
     </div>
