@@ -130,11 +130,11 @@
             <h2 class="card-title">📦 ליקוט כללי</h2>
             <div class="input-group">
                 <label>כמות לליקוט:</label>
-                <input type="text" id="boxTotal" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="this.select()" onclick="this.focus();this.select()">
+                <input type="text" id="boxTotal" tabindex="1" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="this.select()" onclick="this.focus();this.select()">
             </div>
             <div class="input-group">
                 <label>כמות בקרטון/ארגז:</label>
-                <input type="text" id="boxQty" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="this.select()" onclick="this.focus();this.select()">
+                <input type="text" id="boxQty" tabindex="2" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="this.select()" onclick="this.focus();this.select()">
             </div>
             <div class="box-results">
                 <div class="box-info">קרטונים מלאים <span id="resBox">0</span></div>
@@ -154,7 +154,7 @@
             <div class="row">
                 <div class="input-group">
                     <label>צינור 4 מ' (מטר):</label>
-                    <input type="text" id="p4M" placeholder="0" inputmode="decimal" oninput="calc('p4')" onfocus="this.select()" onclick="this.focus();this.select()">
+                    <input type="text" id="p4M" tabindex="3" placeholder="0" inputmode="decimal" oninput="calc('p4')" onfocus="this.select()" onclick="this.focus();this.select()">
                 </div>
                 <div class="result-final valid" id="p4Result"><span id="p4R">0</span> יחידות לליקוט<br><small style="font-size:15px;font-weight:900;color:#fff;margin-top:8px;display:block;background:#1a73e8;border-radius:8px;padding:5px 8px;letter-spacing:1px">🏷️ אריזה 53</small></div>
                 <div class="warning" id="p4Warning">⚠️ כמות לא תקינה — בדוק את הבקשה</div>
@@ -173,11 +173,11 @@
             <div class="row">
                 <div class="input-group">
                     <label>כמות לליקוט:</label>
-                    <input type="text" id="isoM" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="this.select()" onclick="this.focus();this.select()">
+                    <input type="text" id="isoM" tabindex="4" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="this.select()" onclick="this.focus();this.select()">
                 </div>
                 <div class="input-group">
                     <label>כמות בקרטון לפי מטר:</label>
-                    <input type="text" id="isoBoxQty" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="this.select()" onclick="this.focus();this.select()">
+                    <input type="text" id="isoBoxQty" tabindex="5" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="this.select()" onclick="this.focus();this.select()">
                 </div>
                 <div class="box-results" id="isoResults">
                     <div class="box-info green-info">מס' קרטונים <span id="isoBoxes">0</span><small style="font-size:15px;font-weight:900;color:#fff;margin-top:8px;display:block;background:#1a73e8;border-radius:8px;padding:5px 8px;letter-spacing:1px">🏷️ אריזה 11</small></div>
@@ -200,7 +200,27 @@ function goTo(screen) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screen).classList.add('active');
     window.scrollTo(0, 0);
+    setTimeout(() => {
+        const firstInput = document.getElementById(screen).querySelector('input');
+        if (firstInput) { firstInput.focus(); firstInput.select(); }
+    }, 100);
 }
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault();
+        const inputs = Array.from(document.querySelectorAll('.screen.active input'));
+        const current = document.activeElement;
+        const idx = inputs.indexOf(current);
+        if (idx >= 0 && idx < inputs.length - 1) {
+            inputs[idx + 1].focus();
+            inputs[idx + 1].select();
+        } else if (idx === inputs.length - 1) {
+            inputs[0].focus();
+            inputs[0].select();
+        }
+    }
+});
 
 function calc(type) {
     const bT = parseFloat(document.getElementById('boxTotal').value) || 0;
