@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>מנדלסון - מחשבון ליקוט</title>
+    <style>
+        :root { --primary: #1a73e8; --secondary: #34a853; --accent: #d93025; --bg: #f1f3f4; }
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, sans-serif; background: var(--bg); margin: 0; padding: 10px; display: flex; justify-content: center; min-height: 100vh; }
+        .app { width: 100%; max-width: 450px; }
+        .header-title { text-align: center; color: var(--primary); font-size: 26px; font-weight: bold; margin: 8px 0 2px 0; }
+        .header-sub { text-align: center; color: #999; font-size: 13px; margin-bottom: 18px; }
+        .home { display: flex; flex-direction: column; gap: 16px; }
+        .nav-btn { background: white; border: none; border-radius: 20px; padding: 28px 24px; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); cursor: pointer; width: 100%; text-align: right; transition: transform 0.15s, box-shadow 0.15s; border-top: 6px solid var(--primary); }
+        .nav-btn.green { border-top-color: var(--secondary); }
+        .nav-btn.red { border-top-color: var(--accent); }
+        .nav-btn:active { transform: scale(0.97); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .nav-btn .icon { font-size: 48px; line-height: 1; flex-shrink: 0; width: 54px; display: flex; align-items: center; justify-content: center; }
+        .nav-btn .text { flex: 1; }
+        .nav-btn .text h2 { font-size: 22px; font-weight: bold; color: #222; margin: 0 0 4px 0; }
+        .nav-btn .text p { font-size: 13px; color: #999; margin: 0; }
+        .nav-btn .arrow { color: #ccc; font-size: 22px; flex-shrink: 0; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+        .back-btn { display: flex; align-items: center; gap: 8px; background: none; border: none; color: var(--primary); font-size: 16px; font-weight: bold; cursor: pointer; padding: 8px 0; margin-bottom: 16px; }
+        .back-btn:active { opacity: 0.6; }
+        .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 6px solid var(--primary); }
+        .card.green { border-top-color: var(--secondary); }
+        .card.red { border-top-color: var(--accent); }
+        h2.card-title { margin: 0 0 18px 0; color: #333; font-size: 20px; display: flex; align-items: center; gap: 10px; }
+        .row { background: #f8f9fa; padding: 15px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #eee; }
+        .input-group { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        label { font-size: 15px; font-weight: bold; color: #444; }
+        input { width: 110px; padding: 12px; border: 2px solid #dfe1e5; border-radius: 10px; font-size: 20px; text-align: center; background: #fff; }
+        input:focus { border-color: var(--primary); outline: none; background: #e8f0fe; }
+        .result-final { background: #fee8e6; color: var(--accent); padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 19px; border: 1px solid #fad2cf; margin-top: 5px; }
+        .result-final.valid { background: #e6f4ea; color: var(--secondary); border-color: #b7dfbf; }
+        .warning { background: #d93025; color: white; padding: 12px 15px; border-radius: 10px; text-align: center; font-weight: bold; font-size: 16px; margin-top: 8px; display: none; }
+        .box-results { display: flex; gap: 10px; margin-top: 10px; align-items: stretch; }
+        .box-info { flex: 1; background: #e8f0fe; color: var(--primary); padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; display: flex; flex-direction: column; justify-content: space-between; }
+        .box-info.green-info { background: #e6f4ea; color: var(--secondary); display: flex; flex-direction: column; justify-content: space-between; }
+        .box-info span { display: block; font-size: 26px; margin-top: 4px; }
+        .box-info small { display: block; font-size: 14px; margin-top: 2px; font-weight: bold; opacity: 0.8; }
+        .badge { font-size:15px; font-weight:900; color:#fff; margin-top:8px; display:block; background:#1a73e8; border-radius:8px; padding:5px 8px; letter-spacing:1px; }
+        .footer { text-align: center; color: #9aa0a6; font-size: 14px; margin-top: 20px; padding-bottom: 20px; }
+
+        .box-split { background: none !important; padding: 0 !important; overflow: hidden; border-radius: 12px; border: 2px solid #b8dfc4; flex: 1; display: flex; flex-direction: column; }
+        .box-split .top { background: #e6f4ea; padding: 12px; text-align: center; }
+        .box-split .divider { display: flex; align-items: center; gap: 6px; padding: 0 10px; }
+        .box-split .divider span { flex: 1; height: 1px; background: #b8dfc4; }
+        .box-split .divider label { font-size: 10px; color: #90c0a0; letter-spacing: 1px; white-space: nowrap; font-weight: 700; }
+        .box-split .bottom { background: #d8f0e0; padding: 12px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .box-split .slbl { font-size: 11px; color: #70a880; letter-spacing: 1px; font-weight: 700; margin-bottom: 2px; }
+        .box-split .sval { font-size: 26px; font-weight: 900; color: #1e8a3a; display: block; }
+        .box-split .sval-sub { font-size: 20px; font-weight: 900; color: #34a853; display: block; margin-top: 2px; }
+
+        .sep-btn { flex-shrink: 0; display: flex; align-items: center; justify-content: center; padding: 0 5px; }
+        .sep-btn span { background: #e8f0fe; color: #1a73e8; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; border: 2px solid #c5d9f7; }
+
+        @keyframes pop {
+            0%   { transform: scale(1); }
+            40%  { transform: scale(1.3); }
+            70%  { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        .pop-anim { animation: pop 0.35s ease; }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="header-title">מנדלסון</div>
+    <div class="header-sub">מחשבון ליקוט</div>
+
+    <!-- HOME -->
+    <div id="home" class="screen active">
+        <div class="home">
+            <button class="nav-btn" onclick="goTo('boxes')">
+                <div class="icon">📦</div>
+                <div class="text"><h2>ליקוט כללי</h2><p>חישוב קרטונים מלאים ובודדים</p></div>
+                <div class="arrow">‹</div>
+            </button>
+            <button class="nav-btn red" onclick="goTo('pipes')">
+                <div class="icon">
+                    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+                      <rect x="2" y="20" width="18" height="12" rx="2" fill="#d93025"/><rect x="2" y="22" width="18" height="4" fill="#ff6b5b" opacity="0.5"/>
+                      <rect x="17" y="16" width="8" height="20" rx="2" fill="#b71c1c"/>
+                      <rect x="20" y="34" width="12" height="16" rx="2" fill="#d93025"/><rect x="22" y="34" width="4" height="16" fill="#ff6b5b" opacity="0.5"/>
+                      <rect x="16" y="33" width="20" height="7" rx="2" fill="#b71c1c"/>
+                      <rect x="1" y="19" width="5" height="14" rx="1" fill="#b71c1c"/>
+                      <rect x="15" y="48" width="22" height="4" rx="1" fill="#b71c1c"/>
+                    </svg>
+                </div>
+                <div class="text"><h2>ליקוט צינורות</h2><p>חישוב יחידות לפי 4 מטר</p></div>
+                <div class="arrow">‹</div>
+            </button>
+            <button class="nav-btn green" onclick="goTo('iso')">
+                <div class="icon">
+                    <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
+                      <rect x="10" y="20" width="32" height="12" rx="6" fill="#1e6b38"/><rect x="10" y="22" width="32" height="5" rx="3" fill="#2d9e55" opacity="0.5"/>
+                      <rect x="6" y="15" width="40" height="22" rx="8" fill="none" stroke="#34a853" stroke-width="3" stroke-dasharray="5 3"/>
+                      <path d="M23 10 Q24 6 26 8 Q27 4 29 7 Q31 4 32 8 Q34 5 34 10" stroke="#f4a020" stroke-width="2" fill="none" stroke-linecap="round"/>
+                      <rect x="6" y="19" width="5" height="14" rx="2" fill="#1e6b38"/><rect x="41" y="19" width="5" height="14" rx="2" fill="#1e6b38"/>
+                    </svg>
+                </div>
+                <div class="text"><h2>ליקוט בידוד</h2><p>חישוב קרטונים מלאים ובודדים לפי 2 מטר</p></div>
+                <div class="arrow">‹</div>
+            </button>
+        </div>
+    </div>
+
+    <!-- BOXES -->
+    <div id="boxes" class="screen">
+        <button class="back-btn" onclick="goTo('home')">‹ חזרה</button>
+        <div class="card">
+            <h2 class="card-title">📦 ליקוט כללי</h2>
+            <div class="input-group">
+                <label>כמות לליקוט:</label>
+                <input type="text" id="boxTotal" tabindex="1" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="this.select()" onclick="this.focus();this.select()">
+            </div>
+            <div class="input-group">
+                <label>כמות בקרטון/ארגז:</label>
+                <input type="text" id="boxQty" tabindex="2" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="this.select()" onclick="this.focus();this.select()">
+            </div>
+            <div class="box-results">
+                <div class="box-info">קרטונים מלאים: <span id="resBox">0</span></div>
+                <div class="sep-btn"><span>+</span></div>
+                <div class="box-info">בודדים: <span id="resLoose">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIPES -->
+    <div id="pipes" class="screen">
+        <button class="back-btn" onclick="goTo('home')">‹ חזרה</button>
+        <div class="card red">
+            <h2 class="card-title">
+                <svg width="28" height="28" viewBox="0 0 52 52" fill="none"><rect x="2" y="20" width="18" height="12" rx="2" fill="#d93025"/><rect x="2" y="22" width="18" height="4" fill="#ff6b5b" opacity="0.5"/><rect x="17" y="16" width="8" height="20" rx="2" fill="#b71c1c"/><rect x="20" y="34" width="12" height="16" rx="2" fill="#d93025"/><rect x="22" y="34" width="4" height="16" fill="#ff6b5b" opacity="0.5"/><rect x="16" y="33" width="20" height="7" rx="2" fill="#b71c1c"/><rect x="1" y="19" width="5" height="14" rx="1" fill="#b71c1c"/><rect x="15" y="48" width="22" height="4" rx="1" fill="#b71c1c"/></svg>
+                ליקוט צינורות
+            </h2>
+            <div class="row">
+                <div class="input-group">
+                    <label>כמות לליקוט:</label>
+                    <input type="text" id="p4M" tabindex="3" placeholder="0" inputmode="decimal" oninput="calc('p4')" onfocus="this.select()" onclick="this.focus();this.select()">
+                </div>
+                <div class="result-final valid" id="p4Result">
+                    <span id="p4R">0</span> יחידות לליקוט
+                    <small class="badge">🏷️ אריזה 53</small>
+                </div>
+                <div class="warning" id="p4Warning">⚠️ כמות לא תקינה — בדוק את ההזמנה!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ISO -->
+    <div id="iso" class="screen">
+        <button class="back-btn" onclick="goTo('home')">‹ חזרה</button>
+        <div class="card green">
+            <h2 class="card-title">
+                <svg width="28" height="28" viewBox="0 0 52 52" fill="none"><rect x="10" y="20" width="32" height="12" rx="6" fill="#1e6b38"/><rect x="10" y="22" width="32" height="5" rx="3" fill="#2d9e55" opacity="0.5"/><rect x="6" y="15" width="40" height="22" rx="8" fill="none" stroke="#34a853" stroke-width="3" stroke-dasharray="5 3"/><path d="M23 10 Q24 6 26 8 Q27 4 29 7 Q31 4 32 8 Q34 5 34 10" stroke="#f4a020" stroke-width="2" fill="none" stroke-linecap="round"/><rect x="6" y="19" width="5" height="14" rx="2" fill="#1e6b38"/><rect x="41" y="19" width="5" height="14" rx="2" fill="#1e6b38"/></svg>
+                ליקוט בידוד
+            </h2>
+            <div class="row">
+                <div class="input-group">
+                    <label>כמות לליקוט:</label>
+                    <input type="text" id="isoM" tabindex="4" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="this.select()" onclick="this.focus();this.select()">
+                </div>
+                <div class="input-group">
+                    <label>כמות בקרטון לפי מטר:</label>
+                    <input type="text" id="isoBoxQty" tabindex="5" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="this.select()" onclick="this.focus();this.select()">
+                </div>
+                <div class="box-results" id="isoResults">
+                    <div class="box-info green-info">
+                        מס' קרטונים:
+                        <span id="isoBoxes">0</span>
+                        <small class="badge">🏷️ אריזה 11</small>
+                    </div>
+                    <div class="sep-btn"><span style="background:#e6f4ea;color:#34a853;border-color:#b8dfc4">+</span></div>
+                    <div class="box-split">
+                        <div class="top">
+                            <div class="slbl">מטר</div>
+                            <span class="sval" id="isoLooseM">—</span>
+                        </div>
+                        <div class="divider"><span></span><label>יחידות</label><span></span></div>
+                        <div class="bottom">
+                            <span class="sval-sub" id="isoLoose"></span>
+                            <small class="badge">🏷️ אריזה 21</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="warning" id="isoWarning">⚠️ כמות לא תקינה — בדוק את ההזמנה!</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">נוצר על ידי רז .ח.</div>
+<div style="display:flex;justify-content:center;margin-top:10px;margin-bottom:20px;">
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=razserv2010.picking-calculator&left_text=%D7%9E%D7%91%D7%A7%D7%A8%D7%99%D7%9D&logo=github" alt="מבקרים">
+</div>
+</div>
+
+<script>
+function goTo(screen) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screen).classList.add('active');
+    window.scrollTo(0, 0);
+    setTimeout(() => {
+        const firstInput = document.getElementById(screen).querySelector('input');
+        if (firstInput) { firstInput.focus(); firstInput.select(); }
+    }, 100);
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault();
+        const inputs = Array.from(document.querySelectorAll('.screen.active input'));
+        const current = document.activeElement;
+        const idx = inputs.indexOf(current);
+        if (idx >= 0 && idx < inputs.length - 1) {
+            inputs[idx + 1].focus();
+            inputs[idx + 1].select();
+        } else if (idx === inputs.length - 1) {
+            inputs[0].focus();
+            inputs[0].select();
+        }
+    }
+});
+
+function popUpdate(el, value) {
+    el.classList.remove('pop-anim');
+    void el.offsetWidth;
+    el.innerText = value;
+    el.classList.add('pop-anim');
+}
+
+function calc(type) {
+    const bT = parseFloat(document.getElementById('boxTotal').value) || 0;
+    const bQ = parseFloat(document.getElementById('boxQty').value) || 0;
+    const p4Meters = parseFloat(document.getElementById('p4M').value) || 0;
+    const isoMeters = parseFloat(document.getElementById('isoM').value) || 0;
+    const isoUnits = Math.ceil(isoMeters / 2);
+    const isoBoxQty = parseFloat(document.getElementById('isoBoxQty').value) || 0;
+
+    // ליקוט כללי
+    if (bQ > 0) {
+        popUpdate(document.getElementById('resBox'), Math.floor(bT / bQ));
+        popUpdate(document.getElementById('resLoose'), Math.round(bT % bQ));
+    } else {
+        popUpdate(document.getElementById('resBox'), 0);
+        popUpdate(document.getElementById('resLoose'), 0);
+    }
+
+    // צינורות
+    const p4Valid = p4Meters > 0 && p4Meters % 4 === 0;
+    const p4Invalid = p4Meters > 0 && p4Meters % 4 !== 0;
+    const p4Units = p4Valid ? p4Meters / 4 : 0;
+    popUpdate(document.getElementById('p4R'), p4Valid ? p4Units : '—');
+    const p4El = document.getElementById('p4Result');
+    p4El.style.display = p4Invalid ? 'none' : 'block';
+    if (p4Valid) p4El.classList.add('valid'); else p4El.classList.remove('valid');
+    document.getElementById('p4Warning').style.display = p4Invalid ? 'block' : 'none';
+
+    // בידוד
+    const isoInvalid = isoMeters > 0 && isoMeters % 2 !== 0;
+    document.getElementById('isoWarning').style.display = isoInvalid ? 'block' : 'none';
+    document.getElementById('isoResults').style.display = isoInvalid ? 'none' : 'flex';
+
+    if (!isoInvalid) {
+        if (isoBoxQty > 0) {
+            const isoFullBoxes = Math.floor(isoMeters / isoBoxQty);
+            const isoLooseM = isoMeters % isoBoxQty;
+            const isoLooseUnits = Math.ceil(isoLooseM / 2);
+            popUpdate(document.getElementById('isoBoxes'), isoFullBoxes);
+            popUpdate(document.getElementById('isoLooseM'), isoLooseM > 0 ? isoLooseM + ' מטר' : '0');
+            document.getElementById('isoLoose').innerText = isoLooseUnits > 0 ? isoLooseUnits + " יח'" : '';
+        } else {
+            popUpdate(document.getElementById('isoBoxes'), '—');
+            popUpdate(document.getElementById('isoLooseM'), isoUnits > 0 ? isoMeters + ' מטר' : '—');
+            document.getElementById('isoLoose').innerText = isoUnits > 0 ? isoUnits + " יח'" : '';
+        }
+    }
+}
+</script>
+</body>
+</html>
