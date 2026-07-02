@@ -25,7 +25,7 @@
         .screen.active { display: block; }
         .back-btn { display: flex; align-items: center; gap: 8px; background: none; border: none; color: var(--primary); font-size: 16px; font-weight: bold; cursor: pointer; padding: 8px 0; margin-bottom: 16px; }
         .back-btn:active { opacity: 0.6; }
-        .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 6px solid var(--primary); }
+        .card { background: white; border-radius: 16px; padding: 18px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-top: 6px solid var(--primary); scroll-margin-top: 12px; }
         .card.green { border-top-color: var(--secondary); }
         .card.red { border-top-color: var(--accent); }
         h2.card-title { margin: 0 0 18px 0; color: #333; font-size: 20px; display: flex; align-items: center; gap: 10px; }
@@ -116,11 +116,11 @@
             <h2 class="card-title">📦 ליקוט כללי</h2>
             <div class="input-group">
                 <label>כמות לליקוט:</label>
-                <input type="text" id="boxTotal" tabindex="1" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="this.select()" onclick="this.focus();this.select()">
+                <input type="text" id="boxTotal" tabindex="1" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="handleFocus(this)" onclick="this.focus();this.select()">
             </div>
             <div class="input-group">
                 <label>כמות בקרטון/ארגז:</label>
-                <input type="text" id="boxQty" tabindex="2" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="this.select()" onclick="this.focus();this.select()">
+                <input type="text" id="boxQty" tabindex="2" placeholder="0" inputmode="decimal" oninput="calc('boxes')" onfocus="handleFocus(this)" onclick="this.focus();this.select()" data-last-field="true">
             </div>
             <div class="box-results">
                 <div class="box-info">קרטונים מלאים: <span id="resBox">0</span></div>
@@ -141,7 +141,7 @@
             <div class="row">
                 <div class="input-group">
                     <label>כמות לליקוט:</label>
-                    <input type="text" id="p4M" tabindex="3" placeholder="0" inputmode="decimal" oninput="calc('p4')" onfocus="this.select()" onclick="this.focus();this.select()">
+                    <input type="text" id="p4M" tabindex="3" placeholder="0" inputmode="decimal" oninput="calc('p4')" onfocus="handleFocus(this)" onclick="this.focus();this.select()" data-last-field="true">
                 </div>
                 <div class="result-final valid" id="p4Result">
                     <span id="p4R">0</span> יחידות לליקוט
@@ -163,11 +163,11 @@
             <div class="row">
                 <div class="input-group">
                     <label>כמות לליקוט:</label>
-                    <input type="text" id="isoM" tabindex="4" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="this.select()" onclick="this.focus();this.select()">
+                    <input type="text" id="isoM" tabindex="4" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="handleFocus(this)" onclick="this.focus();this.select()">
                 </div>
                 <div class="input-group">
                     <label>כמות בקרטון לפי מטר:</label>
-                    <input type="text" id="isoBoxQty" tabindex="5" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="this.select()" onclick="this.focus();this.select()">
+                    <input type="text" id="isoBoxQty" tabindex="5" placeholder="0" inputmode="decimal" oninput="calc('iso')" onfocus="handleFocus(this)" onclick="this.focus();this.select()" data-last-field="true">
                 </div>
                 <div class="box-results" id="isoResults">
                     <div class="box-info green-info">
@@ -204,10 +204,8 @@ function goTo(screen) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screen).classList.add('active');
     window.scrollTo(0, 0);
-    setTimeout(() => {
-        const firstInput = document.getElementById(screen).querySelector('input');
-        if (firstInput) { firstInput.focus(); firstInput.select(); }
-    }, 100);
+    // No auto-focus here on purpose: the keyboard should only open once the
+    // user actually taps a field, not automatically on screen entry.
 }
 
 document.addEventListener('keydown', function(e) {
@@ -232,6 +230,54 @@ function popUpdate(el, value) {
     el.innerText = value;
     el.classList.add('pop-anim');
 }
+
+// --- Auto-scroll the active card into view once the keyboard has
+// finished opening (fixes the "works only on 2nd tap" issue, since we
+// wait for the real viewport resize instead of a fixed short delay). ---
+function handleFocus(el) {
+    el.select();
+    const card = el.closest('.card');
+    let done = false;
+    const doScroll = () => {
+        if (done) return;
+        done = true;
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    if (window.visualViewport) {
+        // Android fires several 'resize' events while the keyboard animates
+        // open, not just one at the end. Debounce so we only scroll once
+        // the viewport has actually settled at its final size.
+        let settleTimer;
+        const onResize = () => {
+            clearTimeout(settleTimer);
+            settleTimer = setTimeout(() => {
+                doScroll();
+                window.visualViewport.removeEventListener('resize', onResize);
+            }, 120);
+        };
+        window.visualViewport.addEventListener('resize', onResize);
+        // Safety net in case no resize event fires at all.
+        setTimeout(() => {
+            window.visualViewport.removeEventListener('resize', onResize);
+            doScroll();
+        }, 600);
+    } else {
+        setTimeout(doScroll, 300);
+    }
+}
+
+// --- Auto-dismiss the keyboard after the user finishes typing in the
+// last field of the active screen (debounced so it doesn't close mid-digit). ---
+let lastFieldBlurTimer;
+document.addEventListener('input', function(e) {
+    if (e.target.matches('input[data-last-field="true"]')) {
+        clearTimeout(lastFieldBlurTimer);
+        lastFieldBlurTimer = setTimeout(() => {
+            e.target.blur();
+        }, 900);
+    }
+});
 
 function calc(type) {
     const bT = parseFloat(document.getElementById('boxTotal').value) || 0;
